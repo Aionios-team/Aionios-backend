@@ -1,13 +1,81 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+// 1. Tabla de Roles
+model Rol {
+  id          Int       @id @default(autoincrement())
+  nombre_rol  String    @db.VarChar(50)
+  descripcion String?   @db.VarChar(255)
+  usuarios    Usuario[]
+}
+
+// 2. Tabla de Usuarios
+model Usuario {
+  id             Int          @id @default(autoincrement())
+  email          String       @unique
+  password_hash  String
+  nombre         String       @db.VarChar(100)
+  apellido       String       @db.VarChar(100)
+  telefono       String?      @db.VarChar(20)
+  id_rol         Int
+  rol            Rol          @relation(fields: [id_rol], references: [id])
+  fecha_registro DateTime     @default(now())
+  negocios       Negocio[]
+  solicitudes    Solicitud[]
+}
+
+// 3. Tabla de Negocios
+model Negocio {
+  id                 Int          @id @default(autoincrement())
+  id_dueno           Int
+  dueno              Usuario      @relation(fields: [id_dueno], references: [id])
+  nombre             String       @db.VarChar(150)
+  slug               String       @unique
+  descripcion        String?      @db.Text
+  direccion          String?      @db.Text
+  telefono_comercial String?      @db.VarChar(20)
+  solicitudes        Solicitud[]
+}
+
+// Enums para estandarizar los estados
+enum EstadoSolicitud {
+  PENDIENTE
+  CONFIRMADA
+  CANCELADA
+}
+
+enum EstadoPago {
+  PENDIENTE
+  COMPLETADO
+  FALLIDO
+  REEMBOLSADO
+}
+
+// 4. Tabla de Solicitudes (Citas)
+model Solicitud {
+  id                   Int             @id @default(autoincrement())
+  id_usuario           Int
+  usuario              Usuario         @relation(fields: [id_usuario], references: [id])
+  id_negocio           Int
+  negocio              Negocio         @relation(fields: [id_negocio], references: [id])
+  id_servicio_nosql    String          @db.VarChar(255)
+  fecha_hora_propuesta DateTime
+  estado               EstadoSolicitud @default(PENDIENTE)
+  pagos                Pago[]
+}
+
+// 5. Tabla de Pagos
+model Pago {
+  id             Int        @id @default(autoincrement())
+  id_cita        Int
+  cita           Solicitud  @relation(fields: [id_cita], references: [id])
+  monto          Decimal    @db.Decimal(10, 2)
+  metodo_pago    String     @db.VarChar(50)
+  estado_pago    EstadoPago @default(PENDIENTE)
+  transaccion_id String?    @unique
 }

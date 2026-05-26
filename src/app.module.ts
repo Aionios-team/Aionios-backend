@@ -13,9 +13,31 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 import { SupportTicketsModule } from './support-tickets/support-tickets.module';
 import { BusinessUiModule } from './business-ui/business-ui.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [AuthModule, UsersModule, BusinessModule, ServicesModule, RequestsModule, PaymentsModule, HorariosModule, ReviewsModule, NotificationsModule, ActivityLogsModule, SupportTicketsModule, BusinessUiModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, 
+    }),
+    MongooseModule.forRootAsync({
+      useFactory: () => ({
+        uri: process.env.MONGO_URI,
+      }),
+    }),
+    AuthModule, 
+    UsersModule, 
+    BusinessModule, 
+    ServicesModule, 
+    RequestsModule, 
+    PaymentsModule,
+    HorariosModule, 
+    ReviewsModule, 
+    NotificationsModule, 
+    ActivityLogsModule, 
+    SupportTicketsModule, 
+    BusinessUiModule],
   controllers: [AppController],
   providers: [AppService],
 })
