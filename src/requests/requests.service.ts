@@ -30,6 +30,7 @@ export class RequestsService {
       where: { id_usuario: userId },
       include: {
         negocio: { select: { id: true, nombre: true, slug: true, direccion: true } },
+        pagos:   { select: { id: true, monto: true, metodo_pago: true, estado_pago: true } },
       },
       orderBy: { fecha_hora_propuesta: 'desc' },
     });
