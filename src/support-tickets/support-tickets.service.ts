@@ -23,6 +23,14 @@ export class SupportTicketsService {
 		return this.ticketModel.findByIdAndUpdate(id, data, { new: true }).exec();
 	}
 
+	addMensaje(id: string, mensaje: { autor_id: number; texto: string; autor_nombre?: string }) {
+		return this.ticketModel.findByIdAndUpdate(
+			id,
+			{ $push: { mensajes: { ...mensaje, fecha: new Date() } } },
+			{ new: true },
+		).exec();
+	}
+
 	remove(id: string) {
 		return this.ticketModel.findByIdAndDelete(id).exec();
 	}

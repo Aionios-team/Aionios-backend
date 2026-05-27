@@ -11,11 +11,17 @@ export class SupportTicket {
 	@Prop({ required: true })
 	asunto: string;
 
+	@Prop()
+	categoria: string;
+
+	@Prop({ enum: ['baja', 'media', 'alta'], default: 'media' })
+	prioridad: string;
+
+	@Prop({ enum: ['abierto', 'en_proceso', 'resuelto'], default: 'abierto' })
+	estado: string;
+
 	@Prop({ type: [Object], default: [] })
 	mensajes: any[];
-
-	@Prop({ default: 'abierto' })
-	estado: string;
 }
 
 export const SupportTicketSchema = SchemaFactory.createForClass(SupportTicket);
