@@ -19,6 +19,10 @@ export class ReviewsService {
 		return this.reviewModel.find({ negocio_id: negocioId }).sort({ createdAt: -1 }).limit(limit).exec();
 	}
 
+	findByUsuario(userId: number) {
+		return this.reviewModel.find({ usuario_id: userId }).sort({ createdAt: -1 }).exec();
+	}
+
 	findOne(id: string) {
 		return this.reviewModel.findById(id).exec();
 	}
