@@ -23,7 +23,7 @@ export class BusinessController {
 	}
 
 	@Get(':id')
-	@Roles('super administrador', 'administrador de negocio')
+	@Roles('cliente', 'super administrador', 'administrador de negocio', 'staff del negocio')
 	findOne(@Param('id') id: string) {
 		return this.businessService.findOne(Number(id));
 	}
