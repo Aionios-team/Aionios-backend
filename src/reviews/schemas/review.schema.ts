@@ -11,6 +11,9 @@ export class Review {
 	@Prop({ required: true })
 	usuario_id: number;
 
+	@Prop()
+	nombre_cliente: string;
+
 	@Prop({ required: true, min: 1, max: 5 })
 	rating: number;
 
@@ -19,6 +22,12 @@ export class Review {
 
 	@Prop()
 	fecha: Date;
+
+	@Prop()
+	respuesta: string;
+
+	@Prop()
+	fecha_respuesta: Date;
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);

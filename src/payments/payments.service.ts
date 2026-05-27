@@ -11,11 +11,28 @@ export class PaymentsService {
   }
 
   findAll() {
-    return this.prisma.pago.findMany();
+    return this.prisma.pago.findMany({ include: { cita: { include: { usuario: { select: { id: true, nombre: true, apellido: true } } } } } });
+  }
+
+  findByNegocio(negocioId: number) {
+    return this.prisma.pago.findMany({
+      where: { cita: { id_negocio: negocioId } },
+      include: {
+        cita: {
+          include: {
+            usuario: { select: { id: true, nombre: true, apellido: true } },
+          },
+        },
+      },
+      orderBy: { id: 'desc' },
+    });
   }
 
   async findOne(id: number) {
-    const payment = await this.prisma.pago.findUnique({ where: { id } });
+    const payment = await this.prisma.pago.findUnique({
+      where: { id },
+      include: { cita: { include: { usuario: { select: { id: true, nombre: true, apellido: true } } } } },
+    });
     if (!payment) throw new NotFoundException('Pago no encontrado');
     return payment;
   }

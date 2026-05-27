@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete, HttpCode } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 
 
@@ -29,6 +29,12 @@ export class ReviewsController {
 	@Patch(':id')
 	update(@Param('id') id: string, @Body() body: any) {
 		return this.reviewsService.update(id, body);
+	}
+
+	@Post(':id/respuesta')
+	@HttpCode(200)
+	addRespuesta(@Param('id') id: string, @Body('respuesta') respuesta: string) {
+		return this.reviewsService.addRespuesta(id, respuesta);
 	}
 
 	@Delete(':id')

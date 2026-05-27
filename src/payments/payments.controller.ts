@@ -25,6 +25,12 @@ export class PaymentsController {
 		return this.paymentsService.findAll();
 	}
 
+	@Get('negocio/:negocioId')
+	@Roles('administrador de negocio', 'super administrador')
+	findByNegocio(@Param('negocioId') negocioId: string) {
+		return this.paymentsService.findByNegocio(Number(negocioId));
+	}
+
 	@Get(':id')
 	@Roles('administrador de negocio', 'super administrador')
 	findOne(@Param('id') id: string) {

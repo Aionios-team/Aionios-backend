@@ -27,6 +27,14 @@ export class ReviewsService {
 		return this.reviewModel.findByIdAndUpdate(id, data, { new: true }).exec();
 	}
 
+	addRespuesta(id: string, respuesta: string) {
+		return this.reviewModel.findByIdAndUpdate(
+			id,
+			{ respuesta, fecha_respuesta: new Date() },
+			{ new: true },
+		).exec();
+	}
+
 	remove(id: string) {
 		return this.reviewModel.findByIdAndDelete(id).exec();
 	}
