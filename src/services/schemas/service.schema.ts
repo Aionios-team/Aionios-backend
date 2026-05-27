@@ -14,17 +14,11 @@ export class Service {
 	@Prop()
 	descripcion: string;
 
-	@Prop({ enum: ['tiempo_fijo', 'por_hora', 'cotizacion_requerida'] })
-	tipo_cobro: string;
+	@Prop({ type: Number, required: true })
+	precio: number;
 
 	@Prop({ type: Number })
-	precio_base: number;
-
-	@Prop({ type: Number, nullable: true })
-	duracion_minutos?: number;
-
-	@Prop({ type: Object, default: {} })
-	campos_adicionales?: any;
+	duracionMinutos: number;
 }
 
 export const ServiceSchema = SchemaFactory.createForClass(Service);

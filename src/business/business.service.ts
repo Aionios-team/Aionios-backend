@@ -13,6 +13,10 @@ export class BusinessService {
     return this.prisma.negocio.findMany();
   }
 
+  findByOwner(userId: number) {
+    return this.prisma.negocio.findFirst({ where: { id_dueno: userId } });
+  }
+
   async findOne(id: number) {
     const negocio = await this.prisma.negocio.findUnique({ where: { id } });
     if (!negocio) throw new NotFoundException('Negocio no encontrado');

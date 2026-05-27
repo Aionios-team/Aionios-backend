@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete, Req } from '@nestjs/common';
 import { BusinessService } from './business.service';
 import { Roles } from '../common/decorators/roles.decorator';
 
@@ -13,9 +13,13 @@ export class BusinessController {
 	}
 
 	@Get()
-	@Roles('super administrador', 'administrador de negocio')
 	findAll() {
 		return this.businessService.findAll();
+	}
+
+	@Get('mine')
+	findMine(@Req() req: any) {
+		return this.businessService.findByOwner(req.user.sub);
 	}
 
 	@Get(':id')
