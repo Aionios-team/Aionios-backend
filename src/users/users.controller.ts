@@ -1,10 +1,17 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('users')
 export class UsersController {
 	constructor(private usersService: UsersService) {}
+
+	@Patch('me')
+	@Roles('cliente', 'administrador de negocio', 'staff del negocio', 'super administrador')
+	updateMe(@Req() req: any, @Body() body: any) {
+		const allowed = { nombre: body.nombre, apellido: body.apellido, telefono: body.telefono };
+		return this.usersService.update(req.user.sub, allowed);
+	}
 
 	@Post()
 	@Roles('super administrador')
