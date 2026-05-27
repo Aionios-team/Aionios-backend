@@ -34,7 +34,7 @@ export class ActivityLoggingInterceptor implements NestInterceptor {
           timestamp: new Date(),
         });
 
-        if (['POST', 'PATCH', 'DELETE'].includes(method)) {
+        if (['POST', 'PATCH', 'DELETE'].includes(method) && userId) {
           void this.notificationsService.create({
             usuario_id: userId,
             titulo: 'Actividad registrada',
