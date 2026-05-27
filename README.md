@@ -4,12 +4,23 @@ Sistema SaaS full-stack para que negocios locales gestionen sus citas, servicios
 
 ---
 
+## USUARIOS
+Cliente: 
+Correo electrónico: cliente@example.com
+Contraseña: cliente123
+
+Dueño de negocio:
+Correo electrónico: "dueno@example.com"
+Contraseña: "dueno123"
+
+
 ## Repositorios
 
 | Repositorio | URL |
 |---|---|
 | **Backend** (NestJS) | https://github.com/Aionios-team/Aionios-backend |
-| **Frontend** (Next.js) | https://github.com/Aionios-team/Aionios-frontend |
+| **Frontend** (Next.js) | https://github.com/SergioErnestoRosasDucoing/Aionios-frontend |
+| **Frontend Desplegado** (Next.js) | https://aionios-frontend.vercel.app/login |
 
 ---
 
@@ -61,7 +72,7 @@ Sistema SaaS full-stack para que negocios locales gestionen sus citas, servicios
 | Mongoose | 9 | ODM → MongoDB (Atlas) |
 | @nestjs/jwt | 11 | Autenticación JWT |
 | bcryptjs | 2 | Hash de contraseñas |
-| Stripe SDK | 16 | Webhook de pagos en línea |
+
 
 ### Frontend
 | Tecnología | Versión | Uso |
@@ -205,7 +216,7 @@ npm run start:dev
 ### 2. Frontend
 
 ```bash
-git clone https://github.com/Aionios-team/Aionios-frontend.git
+git clone https://github.com/SergioErnestoRosasDucoing/Aionios-frontend
 cd Aionios-frontend
 
 npm install
@@ -355,8 +366,8 @@ Rol ──< Usuario >── Negocio ──< Staff
 Crear cuentas desde `/register`. El campo `id_rol` define el tipo de usuario:
 
 | Tipo | id_rol | Ruta de acceso |
-|---|---|---|
+|--------------------------|---|--------------|
 | Administrador de negocio | 2 | `/dashboard` |
-| Cliente | 4 | `/portal` |
+| Cliente                  | 4 | `/portal`    |
 
 > Al iniciar sesión, el sistema redirige automáticamente al área correspondiente según el rol.

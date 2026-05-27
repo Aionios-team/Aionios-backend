@@ -5,25 +5,17 @@ import { BusinessUiConfig, BusinessUiConfigDocument } from './schemas/business-u
 
 @Injectable()
 export class BusinessUiService {
-	constructor(@InjectModel(BusinessUiConfig.name) private configModel: Model<BusinessUiConfigDocument>) {}
+  constructor(@InjectModel(BusinessUiConfig.name) private configModel: Model<BusinessUiConfigDocument>) {}
 
-	create(data: any) {
-		return this.configModel.create(data);
-	}
+  findByNegocio(negocioId: number) {
+    return this.configModel.findOne({ negocio_id: negocioId }).exec();
+  }
 
-	findAll(limit = 100) {
-		return this.configModel.find().sort({ createdAt: -1 }).limit(limit).exec();
-	}
-
-	findByNegocio(negocioId: number) {
-		return this.configModel.findOne({ negocio_id: negocioId }).exec();
-	}
-
-	update(id: string, data: any) {
-		return this.configModel.findByIdAndUpdate(id, data, { new: true }).exec();
-	}
-
-	remove(id: string) {
-		return this.configModel.findByIdAndDelete(id).exec();
-	}
+  upsertByNegocio(negocioId: number, data: { color_primario?: string; slogan?: string; descripcion_corta?: string }) {
+    return this.configModel.findOneAndUpdate(
+      { negocio_id: negocioId },
+      { $set: data },
+      { new: true, upsert: true },
+    ).exec();
+  }
 }
