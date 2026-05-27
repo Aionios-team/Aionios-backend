@@ -27,6 +27,7 @@ model Usuario {
   fecha_registro DateTime     @default(now())
   negocios       Negocio[]
   solicitudes    Solicitud[]
+  staffAssignments Staff[]
 }
 
 // 3. Tabla de Negocios
@@ -40,6 +41,18 @@ model Negocio {
   direccion          String?      @db.Text
   telefono_comercial String?      @db.VarChar(20)
   solicitudes        Solicitud[]
+  staffAssignments    Staff[]
+}
+
+// Relación Staff: asigna usuarios (staff) a negocios
+model Staff {
+  id         Int     @id @default(autoincrement())
+  usuarioId  Int
+  negocioId  Int
+  usuario    Usuario @relation(fields: [usuarioId], references: [id])
+  negocio    Negocio @relation(fields: [negocioId], references: [id])
+  createdAt  DateTime @default(now())
+  @@unique([usuarioId, negocioId])
 }
 
 // Enums para estandarizar los estados
