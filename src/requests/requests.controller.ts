@@ -1,4 +1,5 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { RequestsService } from './requests.service';
 import { Roles } from '../common/decorators/roles.decorator';
 
@@ -11,6 +12,12 @@ export class RequestsController {
 	@Roles('cliente', 'administrador de negocio', 'staff del negocio', 'super administrador')
 	create(@Body() body: any) {
 		return this.requestsService.create(body);
+	}
+
+	@Get('mine')
+	@Roles('cliente', 'administrador de negocio', 'staff del negocio', 'super administrador')
+	findMine(@Req() req: Request & { user: { sub: number } }) {
+		return this.requestsService.findByUsuario(req.user.sub);
 	}
 
 	@Get()

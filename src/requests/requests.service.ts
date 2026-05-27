@@ -25,6 +25,16 @@ export class RequestsService {
     });
   }
 
+  findByUsuario(userId: number) {
+    return this.prisma.solicitud.findMany({
+      where: { id_usuario: userId },
+      include: {
+        negocio: { select: { id: true, nombre: true, slug: true, direccion: true } },
+      },
+      orderBy: { fecha_hora_propuesta: 'desc' },
+    });
+  }
+
   async findOne(id: number) {
     const req = await this.prisma.solicitud.findUnique({
       where: { id },
