@@ -2,10 +2,10 @@ import { IsBoolean, IsIn, IsNumber, IsOptional, IsString } from 'class-validator
 
 export class CreateNotificationDto {
 	@IsNumber()
-	usuario_id: number;
+	usuario_id!: number;
 
 	@IsString()
-	titulo: string;
+	titulo!: string;
 
 	@IsOptional()
 	@IsString()
