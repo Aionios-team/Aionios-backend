@@ -19,6 +19,12 @@ export class RequestsController {
 		return this.requestsService.findAll();
 	}
 
+	@Get('negocio/:negocioId')
+	@Roles('administrador de negocio', 'staff del negocio', 'super administrador')
+	findByNegocio(@Param('negocioId') negocioId: string) {
+		return this.requestsService.findByNegocio(Number(negocioId));
+	}
+
 	@Get(':id')
 	@Roles('administrador de negocio', 'staff del negocio', 'super administrador')
 	findOne(@Param('id') id: string) {
