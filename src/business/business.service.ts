@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBusinessDto } from './dto/create-business.dto';
 import { UpdateBusinessDto } from './dto/update-business.dto';
@@ -7,7 +7,16 @@ import { UpdateBusinessDto } from './dto/update-business.dto';
 export class BusinessService {
   constructor(private prisma: PrismaService) {}
 
-  create(data: CreateBusinessDto) {
+  async create(data: CreateBusinessDto) {
+    const owner = await this.prisma.usuario.findUnique({
+      where: { id: data.id_dueno },
+      select: { id: true },
+    });
+
+    if (!owner) {
+      throw new BadRequestException(`id_dueno ${data.id_dueno} no existe`);
+    }
+
     return this.prisma.negocio.create({ data });
   }
 

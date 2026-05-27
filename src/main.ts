@@ -1,24 +1,9 @@
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import * as net from 'net';
 import { AppModule } from './app.module';
 
-async function findAvailablePort(startPort: number): Promise<number> {
-  for (let port = startPort; port < startPort + 20; port++) {
-    const isFree = await new Promise<boolean>((resolve) => {
-      const tester = net.createServer();
-      tester.once('error', () => resolve(false));
-      tester.once('listening', () => tester.close(() => resolve(true)));
-      tester.listen(port, '::');
-    });
-
-    if (isFree) return port;
-  }
-
-  throw new Error('No available port found');
-}
-
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule, { rawBody: true });
   app.useGlobalPipes(
     new ValidationPipe({
@@ -28,7 +13,8 @@ async function bootstrap() {
     }),
   );
 
-  const port = await findAvailablePort(Number(process.env.PORT ?? 3000));
+  const port = Number(process.env.PORT ?? 4000);
   await app.listen(port);
+  logger.log(`Servidor iniciado en el puerto ${port}`);
 }
 bootstrap();
