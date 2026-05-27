@@ -1,5 +1,7 @@
 import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
 import { SupportTicketsService } from './support-tickets.service';
+import { CreateSupportTicketDto } from './dto/create-support-ticket.dto';
+import { UpdateSupportTicketDto } from './dto/update-support-ticket.dto';
 
 
 @Controller('support-tickets')
@@ -7,7 +9,7 @@ export class SupportTicketsController {
 	constructor(private ticketsService: SupportTicketsService) {}
 
 	@Post()
-	create(@Body() body: any) {
+	create(@Body() body: CreateSupportTicketDto) {
 		return this.ticketsService.create(body);
 	}
 
@@ -22,7 +24,7 @@ export class SupportTicketsController {
 	}
 
 	@Patch(':id')
-	update(@Param('id') id: string, @Body() body: any) {
+	update(@Param('id') id: string, @Body() body: UpdateSupportTicketDto) {
 		return this.ticketsService.update(id, body);
 	}
 

@@ -1,5 +1,7 @@
 import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
 import { BusinessUiService } from './business-ui.service';
+import { CreateBusinessUiDto } from './dto/create-business-ui.dto';
+import { UpdateBusinessUiDto } from './dto/update-business-ui.dto';
 
 
 @Controller('business-ui')
@@ -7,7 +9,7 @@ export class BusinessUiController {
 	constructor(private uiService: BusinessUiService) {}
 
 	@Post()
-	create(@Body() body: any) {
+	create(@Body() body: CreateBusinessUiDto) {
 		return this.uiService.create(body);
 	}
 
@@ -22,7 +24,7 @@ export class BusinessUiController {
 	}
 
 	@Patch(':id')
-	update(@Param('id') id: string, @Body() body: any) {
+	update(@Param('id') id: string, @Body() body: UpdateBusinessUiDto) {
 		return this.uiService.update(id, body);
 	}
 

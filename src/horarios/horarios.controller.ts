@@ -1,5 +1,7 @@
 import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
 import { HorariosService } from './horarios.service';
+import { CreateHorarioDto } from './dto/create-horario.dto';
+import { UpdateHorarioDto } from './dto/update-horario.dto';
 
 
 @Controller('horarios')
@@ -7,7 +9,7 @@ export class HorariosController {
 	constructor(private horariosService: HorariosService) {}
 
 	@Post()
-	create(@Body() body: any) {
+	create(@Body() body: CreateHorarioDto) {
 		return this.horariosService.create(body);
 	}
 
@@ -27,7 +29,7 @@ export class HorariosController {
 	}
 
 	@Patch(':id')
-	update(@Param('id') id: string, @Body() body: any) {
+	update(@Param('id') id: string, @Body() body: UpdateHorarioDto) {
 		return this.horariosService.update(id, body);
 	}
 

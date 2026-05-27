@@ -1,11 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateBusinessDto } from './dto/create-business.dto';
+import { UpdateBusinessDto } from './dto/update-business.dto';
 
 @Injectable()
 export class BusinessService {
   constructor(private prisma: PrismaService) {}
 
-  create(data: any) {
+  create(data: CreateBusinessDto) {
     return this.prisma.negocio.create({ data });
   }
 
@@ -19,7 +21,7 @@ export class BusinessService {
     return negocio;
   }
 
-  update(id: number, data: any) {
+  update(id: number, data: UpdateBusinessDto) {
     return this.prisma.negocio.update({ where: { id }, data });
   }
 

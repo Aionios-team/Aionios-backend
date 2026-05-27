@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Service, ServiceDocument } from './schemas/service.schema';
+import { CreateServiceDto } from './dto/create-service.dto';
+import { UpdateServiceDto } from './dto/update-service.dto';
 
 @Injectable()
 export class ServicesService {
 	constructor(@InjectModel(Service.name) private serviceModel: Model<ServiceDocument>) {}
 
-	create(data: any) {
+	create(data: CreateServiceDto) {
 		return this.serviceModel.create(data);
 	}
 
@@ -23,7 +25,7 @@ export class ServicesService {
 		return this.serviceModel.findById(id).exec();
 	}
 
-	update(id: string, data: any) {
+	update(id: string, data: UpdateServiceDto) {
 		return this.serviceModel.findByIdAndUpdate(id, data, { new: true }).exec();
 	}
 

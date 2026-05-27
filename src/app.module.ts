@@ -23,6 +23,9 @@ import { ActivityLoggingInterceptor } from './common/interceptors/activity-loggi
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+
+let inMemoryMongoServer: MongoMemoryServer | undefined;
 
 @Module({
   imports: [
@@ -30,9 +33,25 @@ import { ConfigService } from '@nestjs/config';
       isGlobal: true, 
     }),
     MongooseModule.forRootAsync({
-      useFactory: () => ({
-        uri: process.env.MONGO_URI,
-      }),
+      useFactory: async () => {
+        if (process.env.USE_REMOTE_MONGO === 'true' && process.env.MONGO_URI) {
+          return {
+            uri: process.env.MONGO_URI,
+            lazyConnection: true,
+            retryAttempts: 0,
+          };
+        }
+
+        if (!inMemoryMongoServer) {
+          inMemoryMongoServer = await MongoMemoryServer.create();
+        }
+
+        return {
+          uri: inMemoryMongoServer.getUri(),
+          lazyConnection: true,
+          retryAttempts: 0,
+        };
+      },
     }),
     PrismaModule,
     AuthModule, 

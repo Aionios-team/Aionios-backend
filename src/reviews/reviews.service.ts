@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Review, ReviewDocument } from './schemas/review.schema';
+import { CreateReviewDto } from './dto/create-review.dto';
+import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Injectable()
 export class ReviewsService {
 	constructor(@InjectModel(Review.name) private reviewModel: Model<ReviewDocument>) {}
 
-	create(data: any) {
+	create(data: CreateReviewDto) {
 		return this.reviewModel.create(data);
 	}
 
@@ -23,7 +25,7 @@ export class ReviewsService {
 		return this.reviewModel.findById(id).exec();
 	}
 
-	update(id: string, data: any) {
+	update(id: string, data: UpdateReviewDto) {
 		return this.reviewModel.findByIdAndUpdate(id, data, { new: true }).exec();
 	}
 

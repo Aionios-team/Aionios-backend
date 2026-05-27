@@ -1,5 +1,7 @@
 import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
 import { ServicesService } from './services.service';
+import { CreateServiceDto } from './dto/create-service.dto';
+import { UpdateServiceDto } from './dto/update-service.dto';
 
 
 @Controller('services')
@@ -7,7 +9,7 @@ export class ServicesController {
 	constructor(private servicesService: ServicesService) {}
 
 	@Post()
-	create(@Body() body: any) {
+	create(@Body() body: CreateServiceDto) {
 		return this.servicesService.create(body);
 	}
 
@@ -27,7 +29,7 @@ export class ServicesController {
 	}
 
 	@Patch(':id')
-	update(@Param('id') id: string, @Body() body: any) {
+	update(@Param('id') id: string, @Body() body: UpdateServiceDto) {
 		return this.servicesService.update(id, body);
 	}
 

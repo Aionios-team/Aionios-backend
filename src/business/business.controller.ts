@@ -1,6 +1,9 @@
 import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
 import { BusinessService } from './business.service';
 import { Roles } from '../common/decorators/roles.decorator';
+import { CreateBusinessDto } from './dto/create-business.dto';
+import { UpdateBusinessDto } from './dto/update-business.dto';
+import { StaffAssignmentDto } from './dto/staff-assignment.dto';
 
 @Controller('business')
 export class BusinessController {
@@ -8,7 +11,7 @@ export class BusinessController {
 
 	@Post()
 	@Roles('super administrador', 'administrador de negocio')
-	create(@Body() body: any) {
+	create(@Body() body: CreateBusinessDto) {
 		return this.businessService.create(body);
 	}
 
@@ -26,7 +29,7 @@ export class BusinessController {
 
 	@Patch(':id')
 	@Roles('super administrador', 'administrador de negocio')
-	update(@Param('id') id: string, @Body() body: any) {
+	update(@Param('id') id: string, @Body() body: UpdateBusinessDto) {
 		return this.businessService.update(Number(id), body);
 	}
 
@@ -38,14 +41,14 @@ export class BusinessController {
 
 	@Post(':id/staff')
 	@Roles('super administrador', 'administrador de negocio')
-	assignStaff(@Param('id') id: string, @Body('usuarioId') usuarioId: number) {
-		return this.businessService.assignStaff(Number(id), usuarioId);
+	assignStaff(@Param('id') id: string, @Body() body: StaffAssignmentDto) {
+		return this.businessService.assignStaff(Number(id), body.usuarioId);
 	}
 
 	@Delete(':id/staff')
 	@Roles('super administrador', 'administrador de negocio')
-	removeStaff(@Param('id') id: string, @Body('usuarioId') usuarioId: number) {
-		return this.businessService.removeStaff(Number(id), usuarioId);
+	removeStaff(@Param('id') id: string, @Body() body: StaffAssignmentDto) {
+		return this.businessService.removeStaff(Number(id), body.usuarioId);
 	}
 
 	@Get(':id/staff')

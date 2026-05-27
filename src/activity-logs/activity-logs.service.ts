@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ActivityLog, ActivityLogDocument } from './schemas/activity-log.schema';
+import { CreateActivityLogDto } from './dto/create-activity-log.dto';
 
 @Injectable()
 export class ActivityLogsService {
 	constructor(@InjectModel(ActivityLog.name) private logModel: Model<ActivityLogDocument>) {}
 
-	create(data: any) {
+	create(data: CreateActivityLogDto) {
 		return this.logModel.create(data);
 	}
 

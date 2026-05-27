@@ -1,12 +1,16 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateRoleDto } from './dto/create-role.dto';
+import { UpdateRoleDto } from './dto/update-role.dto';
 
 @Injectable()
 export class UsersService {
 	constructor(private prisma: PrismaService) {}
 
-	async create(data: any) {
+	async create(data: CreateUserDto) {
 		const { email, password, nombre, apellido, telefono, id_rol } = data;
 		const exists = await this.prisma.usuario.findUnique({ where: { email } });
 		if (exists) throw new BadRequestException('Email already registered');
@@ -33,12 +37,15 @@ export class UsersService {
 		return user;
 	}
 
-	async update(id: number, data: any) {
-		if (data.password) {
-			data.password_hash = await bcrypt.hash(data.password, 10);
-			delete data.password;
+	async update(id: number, data: UpdateUserDto) {
+		const { password, ...rest } = data;
+		const updateData = { ...rest } as Record<string, unknown>;
+
+		if (password) {
+			updateData.password_hash = await bcrypt.hash(password, 10);
 		}
-		return this.prisma.usuario.update({ where: { id }, data });
+
+		return this.prisma.usuario.update({ where: { id }, data: updateData });
 	}
 
 	async remove(id: number) {
@@ -46,7 +53,7 @@ export class UsersService {
 	}
 
 	// Roles
-	async createRole(data: any) {
+	async createRole(data: CreateRoleDto) {
 		return this.prisma.rol.create({ data });
 	}
 
@@ -60,7 +67,7 @@ export class UsersService {
 		return role;
 	}
 
-	async updateRole(id: number, data: any) {
+	async updateRole(id: number, data: UpdateRoleDto) {
 		return this.prisma.rol.update({ where: { id }, data });
 	}
 

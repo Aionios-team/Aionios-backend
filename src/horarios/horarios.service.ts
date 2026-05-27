@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Horario, HorarioDocument } from './schemas/horario.schema';
+import { CreateHorarioDto } from './dto/create-horario.dto';
+import { UpdateHorarioDto } from './dto/update-horario.dto';
 
 @Injectable()
 export class HorariosService {
 	constructor(@InjectModel(Horario.name) private horarioModel: Model<HorarioDocument>) {}
 
-	create(data: any) {
+	create(data: CreateHorarioDto) {
 		return this.horarioModel.create(data);
 	}
 
@@ -23,7 +25,7 @@ export class HorariosService {
 		return this.horarioModel.findById(id).exec();
 	}
 
-	update(id: string, data: any) {
+	update(id: string, data: UpdateHorarioDto) {
 		return this.horarioModel.findByIdAndUpdate(id, data, { new: true }).exec();
 	}
 

@@ -1,5 +1,7 @@
 import { Controller, Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
+import { CreateNotificationDto } from './dto/create-notification.dto';
+import { UpdateNotificationDto } from './dto/update-notification.dto';
 
 
 @Controller('notifications')
@@ -7,7 +9,7 @@ export class NotificationsController {
 	constructor(private notificationsService: NotificationsService) {}
 
 	@Post()
-	create(@Body() body: any) {
+	create(@Body() body: CreateNotificationDto) {
 		return this.notificationsService.create(body);
 	}
 
@@ -22,7 +24,7 @@ export class NotificationsController {
 	}
 
 	@Patch(':id')
-	update(@Param('id') id: string, @Body() body: any) {
+	update(@Param('id') id: string, @Body() body: UpdateNotificationDto) {
 		return this.notificationsService.update(id, body);
 	}
 

@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { SupportTicket, SupportTicketDocument } from './schemas/support-ticket.schema';
+import { CreateSupportTicketDto } from './dto/create-support-ticket.dto';
+import { UpdateSupportTicketDto } from './dto/update-support-ticket.dto';
 
 @Injectable()
 export class SupportTicketsService {
 	constructor(@InjectModel(SupportTicket.name) private ticketModel: Model<SupportTicketDocument>) {}
 
-	create(data: any) {
+	create(data: CreateSupportTicketDto) {
 		return this.ticketModel.create(data);
 	}
 
@@ -19,7 +21,7 @@ export class SupportTicketsService {
 		return this.ticketModel.find({ usuario_id: usuarioId }).sort({ createdAt: -1 }).exec();
 	}
 
-	update(id: string, data: any) {
+	update(id: string, data: UpdateSupportTicketDto) {
 		return this.ticketModel.findByIdAndUpdate(id, data, { new: true }).exec();
 	}
 
