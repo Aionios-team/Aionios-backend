@@ -17,7 +17,7 @@ export class SupportTicket {
 	@Prop({ enum: ['baja', 'media', 'alta'], default: 'media' })
 	prioridad: string;
 
-	@Prop({ enum: ['abierto', 'en_proceso', 'resuelto'], default: 'abierto' })
+	@Prop({ enum: ['abierto', 'resuelto'], default: 'abierto' })
 	estado: string;
 
 	@Prop({ type: [Object], default: [] })
