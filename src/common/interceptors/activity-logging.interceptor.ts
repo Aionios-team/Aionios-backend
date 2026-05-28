@@ -6,13 +6,11 @@ import {
 } from '@nestjs/common';
 import { Observable, tap } from 'rxjs';
 import { ActivityLogsService } from '../../activity-logs/activity-logs.service';
-import { NotificationsService } from '../../notifications/notifications.service';
 
 @Injectable()
 export class ActivityLoggingInterceptor implements NestInterceptor {
   constructor(
     private activityLogsService: ActivityLogsService,
-    private notificationsService: NotificationsService,
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
@@ -33,16 +31,6 @@ export class ActivityLoggingInterceptor implements NestInterceptor {
           },
           timestamp: new Date(),
         });
-
-        if (['POST', 'PATCH', 'DELETE'].includes(method) && userId) {
-          void this.notificationsService.create({
-            usuario_id: userId,
-            titulo: 'Actividad registrada',
-            mensaje: `${method} ejecutado en ${path}`,
-            leido: false,
-            tipo: 'recordatorio_cita',
-          });
-        }
       }),
     );
   }
