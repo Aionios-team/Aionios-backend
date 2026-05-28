@@ -15,6 +15,10 @@ export class SupportTicketsService {
 		return this.ticketModel.find().sort({ createdAt: -1 }).limit(limit).exec();
 	}
 
+	findOne(id: string) {
+		return this.ticketModel.findById(id).exec();
+	}
+
 	findByUser(usuarioId: number) {
 		return this.ticketModel.find({ usuario_id: usuarioId }).sort({ createdAt: -1 }).exec();
 	}

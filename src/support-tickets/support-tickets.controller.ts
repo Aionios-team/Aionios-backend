@@ -26,6 +26,11 @@ export class SupportTicketsController {
 		return this.ticketsService.findByUser(Number(usuarioId));
 	}
 
+	@Get(':id')
+	findOne(@Param('id') id: string) {
+		return this.ticketsService.findOne(id);
+	}
+
 	@Post(':id/mensaje')
 	@HttpCode(200)
 	addMensaje(@Param('id') id: string, @Body() body: any, @Req() req: any) {
