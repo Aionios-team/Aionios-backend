@@ -13,6 +13,12 @@ export class UsersController {
 		return this.usersService.update(req.user.sub, allowed);
 	}
 
+	@Delete('me')
+	@Roles('cliente', 'administrador de negocio', 'staff del negocio', 'super administrador')
+	deleteMe(@Req() req: any) {
+		return this.usersService.remove(req.user.sub);
+	}
+
 	@Post()
 	@Roles('super administrador')
 	create(@Body() body: any) {
