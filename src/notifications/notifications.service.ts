@@ -15,8 +15,18 @@ export class NotificationsService {
 		return this.notifModel.find().sort({ createdAt: -1 }).limit(limit).exec();
 	}
 
-	findByUser(usuarioId: number) {
-		return this.notifModel.find({ usuario_id: usuarioId }).sort({ createdAt: -1 }).exec();
+	findByUser(usuarioId: number, limit = 10) {
+		return this.notifModel
+			.find({ usuario_id: usuarioId })
+			.sort({ createdAt: -1 })
+			.limit(limit)
+			.exec();
+	}
+
+	removeLegacyByUser(usuarioId: number) {
+		return this.notifModel
+			.deleteMany({ usuario_id: usuarioId, titulo: 'Actividad registrada' })
+			.exec();
 	}
 
 	update(id: string, data: any) {
