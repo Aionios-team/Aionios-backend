@@ -1,6 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { RequestMessage, RequestMessageDocument } from './schemas/request-message.schema';
 
 const userSelect = {
   id: true, nombre: true, apellido: true, email: true, telefono: true,
@@ -22,12 +25,13 @@ export class RequestsService {
   constructor(
     private prisma: PrismaService,
     private notificationsService: NotificationsService,
+    @InjectModel(RequestMessage.name)
+    private messageModel: Model<RequestMessageDocument>,
   ) {}
 
   async create(data: any) {
     const solicitud = await this.prisma.solicitud.create({ data });
 
-    // Obtener datos del negocio (incluye id_dueno y nombre)
     const negocio = await this.prisma.negocio.findUnique({
       where: { id: solicitud.id_negocio },
       select: { id: true, nombre: true, id_dueno: true },
@@ -36,7 +40,6 @@ export class RequestsService {
     const fecha = formatFecha(solicitud.fecha_hora_propuesta);
 
     if (negocio) {
-      // Notificar al dueño del negocio
       void this.notificationsService.create({
         usuario_id: negocio.id_dueno,
         titulo: 'Nueva solicitud de cita',
@@ -45,7 +48,6 @@ export class RequestsService {
         tipo: 'recordatorio_cita',
       });
 
-      // Notificar al cliente que su solicitud fue enviada
       void this.notificationsService.create({
         usuario_id: solicitud.id_usuario,
         titulo: 'Solicitud enviada',
@@ -91,7 +93,6 @@ export class RequestsService {
   }
 
   async update(id: number, data: any) {
-    // Obtener la solicitud antes de actualizar para tener negocio y cliente
     const solicitudActual = await this.prisma.solicitud.findUnique({
       where: { id },
       include: {
@@ -108,7 +109,6 @@ export class RequestsService {
       const clienteNombre = solicitudActual.usuario.nombre;
 
       if (data.estado === 'CONFIRMADA') {
-        // Notificar al cliente: su cita fue confirmada
         void this.notificationsService.create({
           usuario_id: solicitudActual.id_usuario,
           titulo: '¡Cita confirmada!',
@@ -117,7 +117,6 @@ export class RequestsService {
           tipo: 'recordatorio_cita',
         });
       } else if (data.estado === 'CANCELADA') {
-        // Notificar al cliente: su cita fue cancelada
         void this.notificationsService.create({
           usuario_id: solicitudActual.id_usuario,
           titulo: 'Cita cancelada',
@@ -126,7 +125,6 @@ export class RequestsService {
           tipo: 'cancelacion',
         });
 
-        // Notificar también al dueño del negocio por si fue el cliente quien canceló
         if (data.canceladoPor === 'cliente') {
           void this.notificationsService.create({
             usuario_id: solicitudActual.negocio.id_dueno,
@@ -144,5 +142,18 @@ export class RequestsService {
 
   remove(id: number) {
     return this.prisma.solicitud.delete({ where: { id } });
+  }
+
+  /* ── Mensajes de coordinación ── */
+
+  getMensajes(solicitudId: number) {
+    return this.messageModel
+      .find({ solicitud_id: solicitudId })
+      .sort({ createdAt: 1 })
+      .exec();
+  }
+
+  addMensaje(solicitudId: number, data: { autor_id: number; autor_nombre: string; autor_tipo: string; texto: string }) {
+    return this.messageModel.create({ solicitud_id: solicitudId, ...data });
   }
 }
