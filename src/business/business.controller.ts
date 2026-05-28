@@ -22,15 +22,12 @@ export class BusinessController {
 		return this.businessService.findByOwner(req.user.sub);
 	}
 
-	@Get('slug/:slug')
-	findBySlug(@Param('slug') slug: string) {
-		return this.businessService.findBySlug(slug);
-	}
-
-	@Get(':id')
-	@Roles('cliente', 'super administrador', 'administrador de negocio', 'staff del negocio')
-	findOne(@Param('id') id: string) {
-		return this.businessService.findOne(Number(id));
+	@Get(':idOrSlug')
+	findOne(@Param('idOrSlug') idOrSlug: string) {
+		const id = Number(idOrSlug);
+		return isNaN(id)
+			? this.businessService.findBySlug(idOrSlug)
+			: this.businessService.findOne(id);
 	}
 
 	@Patch(':id')
