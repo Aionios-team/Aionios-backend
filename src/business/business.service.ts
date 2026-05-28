@@ -23,6 +23,12 @@ export class BusinessService {
     return negocio;
   }
 
+  async findBySlug(slug: string) {
+    const negocio = await this.prisma.negocio.findUnique({ where: { slug } });
+    if (!negocio) throw new NotFoundException('Negocio no encontrado');
+    return negocio;
+  }
+
   update(id: number, data: any) {
     return this.prisma.negocio.update({ where: { id }, data });
   }

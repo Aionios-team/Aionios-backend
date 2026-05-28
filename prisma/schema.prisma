@@ -38,6 +38,7 @@ model Negocio {
   dueno              Usuario      @relation(fields: [id_dueno], references: [id])
   nombre             String       @db.VarChar(150)
   slug               String       @unique
+  categoria          String?      @db.VarChar(50)
   descripcion        String?      @db.Text
   direccion          String?      @db.Text
   telefono_comercial String?      @db.VarChar(20)

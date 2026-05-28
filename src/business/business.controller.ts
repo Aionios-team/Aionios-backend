@@ -22,6 +22,11 @@ export class BusinessController {
 		return this.businessService.findByOwner(req.user.sub);
 	}
 
+	@Get('slug/:slug')
+	findBySlug(@Param('slug') slug: string) {
+		return this.businessService.findBySlug(slug);
+	}
+
 	@Get(':id')
 	@Roles('cliente', 'super administrador', 'administrador de negocio', 'staff del negocio')
 	findOne(@Param('id') id: string) {
