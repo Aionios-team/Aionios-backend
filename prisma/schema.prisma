@@ -17,18 +17,30 @@ model Rol {
 
 // 2. Tabla de Usuarios
 model Usuario {
-  id             Int          @id @default(autoincrement())
-  email          String       @unique
-  password_hash  String
-  nombre         String       @db.VarChar(100)
-  apellido       String       @db.VarChar(100)
-  telefono       String?      @db.VarChar(20)
-  id_rol         Int
-  rol            Rol          @relation(fields: [id_rol], references: [id])
-  fecha_registro DateTime     @default(now())
-  negocios       Negocio[]
-  solicitudes    Solicitud[]
+  id               Int            @id @default(autoincrement())
+  email            String         @unique
+  password_hash    String
+  nombre           String         @db.VarChar(100)
+  apellido         String         @db.VarChar(100)
+  telefono         String?        @db.VarChar(20)
+  id_rol           Int
+  rol              Rol            @relation(fields: [id_rol], references: [id])
+  fecha_registro   DateTime       @default(now())
+  negocios         Negocio[]
+  solicitudes      Solicitud[]
   staffAssignments Staff[]
+  refreshTokens    RefreshToken[]
+}
+
+// Refresh Tokens para rotación y revocación (OWASP A07)
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique @db.VarChar(512)
+  userId    Int
+  usuario   Usuario  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 // 3. Tabla de Negocios
