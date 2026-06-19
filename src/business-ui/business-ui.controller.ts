@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Param, Body, Req } from '@nestjs/common';
+import { Controller, Get, Put, Param, Body } from '@nestjs/common';
 import { BusinessUiService } from './business-ui.service';
 import { Roles } from '../common/decorators/roles.decorator';
 
@@ -15,6 +15,10 @@ export class BusinessUiController {
   @Roles('administrador de negocio', 'super administrador')
   upsert(@Param('negocioId') negocioId: string, @Body() body: any) {
     const { color_primario, slogan, descripcion_corta } = body;
-    return this.uiService.upsertByNegocio(Number(negocioId), { color_primario, slogan, descripcion_corta });
+    return this.uiService.upsertByNegocio(Number(negocioId), {
+      color_primario,
+      slogan,
+      descripcion_corta,
+    });
   }
 }

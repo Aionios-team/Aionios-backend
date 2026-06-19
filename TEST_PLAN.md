@@ -15,7 +15,7 @@
 
 ### 1.1 Descripción del Sistema
 
-Aionios es una plataforma web que conecta clientes con negocios de servicios locales (barberías, salones, consultorios, etc.). Permite a los clientes buscar negocios, solicitar citas, realizar pagos en línea y dejar reseñas. Los dueños de negocios gestionan su catálogo de servicios, horarios, solicitudes entrantes y staff. Un panel de administración centraliza la supervisión de toda la plataforma.
+Aionios es una plataforma web que conecta clientes con negocios de servicios locales (barberías, salones, consultorios, etc.). Permite a los clientes buscar negocios, solicitar citas, registrar pagos y dejar reseñas. Los dueños de negocios gestionan su catálogo de servicios, horarios, solicitudes entrantes y staff. Un panel de administración centraliza la supervisión de toda la plataforma.
 
 **Stack tecnológico:**
 
@@ -26,10 +26,10 @@ Aionios es una plataforma web que conecta clientes con negocios de servicios loc
 | BD Relacional | PostgreSQL vía Prisma ORM |
 | BD NoSQL | MongoDB vía Mongoose |
 | Autenticación | JWT (HS256) + bcryptjs |
-| Pagos | Stripe |
+| Pagos | Registro interno (PostgreSQL) |
 | Testing Backend | Jest 30 + Supertest |
-| Testing E2E | Playwright (por configurar) |
-| Testing Rendimiento | k6 (por configurar) |
+| Testing E2E | Cypress (por configurar) |
+| Testing Rendimiento | JMeter (por configurar) |
 
 ### 1.2 Objetivos del Plan de Prueba
 
@@ -51,7 +51,7 @@ Aionios es una plataforma web que conecta clientes con negocios de servicios loc
 | **Usuarios** | CRUD de usuarios y roles |
 | **Negocios** | Creación y gestión de negocios, catálogo de servicios |
 | **Solicitudes (Citas)** | Crear, confirmar, cancelar; mensajería en MongoDB |
-| **Pagos** | Creación, actualización de estado, webhook de Stripe |
+| **Pagos** | Creación y actualización de estado de pagos (registro interno en la misma pestaña) |
 | **Horarios** | Gestión de disponibilidad de negocios |
 | **Reseñas** | Crear y consultar reseñas de servicios |
 | **Notificaciones** | Creación y lectura de notificaciones (MongoDB) |
@@ -64,7 +64,7 @@ Aionios es una plataforma web que conecta clientes con negocios de servicios loc
 - Pruebas de infraestructura cloud (AWS/GCP/Azure) — responsabilidad de DevOps externo.
 - Pruebas de compatibilidad con versiones anteriores de Node.js (< 20).
 - Pruebas de localización en idiomas distintos al español.
-- Integración con pasarelas de pago distintas a Stripe.
+- Integración con pasarelas de pago externas (el módulo de pagos es registro interno).
 - Pruebas de la app móvil (no existe en este alcance).
 
 ---
@@ -75,21 +75,21 @@ La estrategia sigue la pirámide de testing: mayor cantidad de pruebas en la bas
 
 ```
           /─────────────────\
-         /   E2E (Playwright) \        ← Flujos completos usuario final
+         /   E2E (Cypress) \        ← Flujos completos usuario final
         /─────────────────────\
-       /   Performance (k6)    \       ← Load, Stress, Spike, Soak
+       /   Performance (JMeter)    \       ← Load, Stress, Spike, Soak
       /───────────────────────\
      /   Security (OWASP ZAP)  \      ← OWASP Top 10
     /──────────────────────────\
    /   Integration (Supertest)  \     ← API REST + BD Relacional + MongoDB
   /────────────────────────────\
- /      Unit (Jest + Mocks)     \     ← Servicios, lógica de negocio
+ /      Unit (Jest)              \     ← Funciones puras, lógica de negocio
 /─────────────────────────────────\
 ```
 
 ### Capa 1 — Pruebas Unitarias (Jest)
 
-Prueban cada servicio de NestJS en aislamiento completo. Todas las dependencias externas (PrismaService, JwtService, NotificationsService, Stripe) son mockeadas con `jest.fn()`. Se aplica el patrón **Arrange-Act-Assert** de forma explícita.
+Prueban funciones puras extraídas de los servicios de NestJS: transformaciones de datos, validaciones y lógica de negocio que no dependen de base de datos ni servicios externos. Se aplica el patrón **Arrange-Act-Assert** de forma explícita con `describe`, `it` y `expect`.
 
 **Prioridad de módulos:**
 
@@ -98,7 +98,7 @@ Prueban cada servicio de NestJS en aislamiento completo. Todas las dependencias 
 | Alta | `AuthService` | Punto de entrada crítico; gestiona tokens y contraseñas |
 | Alta | `UsersService` | Base de todos los flujos; validación de unicidad de email |
 | Alta | `RequestsService` | Core del negocio; orquesta notificaciones y citas |
-| Media | `PaymentsService` | Integración financiera; manejo de estados complejos |
+| Media | `PaymentsService` | Registro interno de pagos; lógica de validación de estados |
 | Media | `HorariosService` | Lógica de disponibilidad; riesgo de bugs en fechas/horas |
 | Baja | `NotificationsService` | Funcionalidad de soporte; menor criticidad |
 
@@ -113,7 +113,7 @@ Prueban los endpoints HTTP completos contra la base de datos real en contenedor 
 - Validación de entrada → 400 con campos faltantes
 - Recurso inexistente → 404
 
-### Capa 3 — Pruebas End-to-End (Playwright)
+### Capa 3 — Pruebas End-to-End (Cypress)
 
 Automatizan flujos completos desde el navegador sobre el frontend (Next.js). Se ejecutan contra el entorno de staging. Usan `data-testid` como selectores únicos.
 
@@ -122,10 +122,10 @@ Automatizan flujos completos desde el navegador sobre el frontend (Next.js). Se 
 2. Login / Logout con credenciales válidas e inválidas
 3. Búsqueda de negocio y solicitud de cita
 4. Panel de negocio: confirmar/cancelar cita
-5. Flujo de pago con Stripe (modo test)
+5. Flujo de registro de pago desde la pestaña de pagos
 6. Admin: gestión de usuarios y negocios
 
-### Capa 4 — Pruebas de Rendimiento (k6)
+### Capa 4 — Pruebas de Rendimiento (JMeter)
 
 Miden el comportamiento bajo carga de los endpoints más solicitados: `POST /auth/login`, `GET /business`, `POST /requests`, `GET /services`.
 
@@ -139,12 +139,12 @@ Verificación manual y automatizada contra el OWASP Top 10. OWASP ZAP en modo ac
 
 | Tipo | Herramienta | Justificación |
 |---|---|---|
-| **Unitarias** | Jest + jest.fn() | Validar lógica de negocio en aislamiento; ejecución en < 10s; detecta regresiones en cada PR |
+| **Unitarias** | Jest | Validar funciones puras de lógica de negocio; ejecución en < 10s; detecta regresiones en cada PR |
 | **Integración API** | Supertest | Valida contratos HTTP reales sin depender del frontend; detecta problemas de serialización y guards |
 | **Integración BD Relacional** | Jest + Prisma (BD test) | Verifica constraints de PostgreSQL (UNIQUE, FK, NOT NULL) que solo se detectan con BD real |
 | **Integración BD NoSQL** | Jest + mongodb-memory-server | Valida schemas de Mongoose y pipelines de agregación de notificaciones/mensajes |
-| **E2E** | Playwright | Garantiza que el usuario final puede completar sus flujos críticos tras cada despliegue |
-| **Rendimiento** | k6 | Identifica el punto de quiebre antes de producción; detecta memory leaks en soak test |
+| **E2E** | Cypress | Garantiza que el usuario final puede completar sus flujos críticos tras cada despliegue |
+| **Rendimiento** | JMeter | Identifica el punto de quiebre antes de producción; detecta memory leaks en soak test |
 | **Seguridad** | OWASP ZAP + Snyk | Cumplimiento regulatorio; protege datos de clientes y transacciones financieras |
 | **Accesibilidad** | axe-core + Lighthouse | Cumplimiento WCAG 2.1 nivel AA para usuarios con discapacidades |
 
@@ -169,11 +169,11 @@ Las pruebas de cada capa **no inician** hasta que se cumplen todos los criterios
 - [ ] El entorno de staging está desplegado y accesible
 - [ ] Los datos semilla (seeders) están cargados en staging
 - [ ] Los `data-testid` necesarios están presentes en los componentes frontend
-- [ ] Playwright está instalado y configurado (`npx playwright install`)
+- [ ] Cypress está instalado y configurado (`npx cypress install`)
 
 ### Pruebas de Rendimiento
 - [ ] El entorno de staging soporta carga similar a producción (mismas specs de servidor)
-- [ ] k6 está instalado localmente o en el servidor de CI
+- [ ] JMeter está instalado localmente o en el servidor de CI
 - [ ] Los endpoints objetivo están documentados con sus parámetros de carga esperados
 
 ### Pruebas de Seguridad
@@ -193,11 +193,11 @@ El software se considera **listo para producción** cuando se cumplen **todos** 
 | Cobertura capa de dominio/servicios | ≥ 80% | `jest --coverage` |
 | Pruebas unitarias pasando | 100% (0 fallos) | Jest |
 | Pruebas de integración API pasando | 100% (0 fallos) | Supertest |
-| Pruebas E2E flujos críticos pasando | 100% (0 fallos) | Playwright |
+| Pruebas E2E flujos críticos pasando | 100% (0 fallos) | Cypress |
 | Defectos abiertos de severidad Critical | 0 | Registro de defectos |
 | Defectos abiertos de severidad High | 0 | Registro de defectos |
-| Tiempo de respuesta P95 en Load Test | < 500ms | k6 |
-| Tasa de errores en Load Test | < 1% | k6 |
+| Tiempo de respuesta P95 en Load Test | < 500ms | JMeter |
+| Tasa de errores en Load Test | < 1% | JMeter |
 | Vulnerabilidades OWASP críticas/altas | 0 sin resolver | OWASP ZAP / Snyk |
 | Score Lighthouse Accesibilidad | ≥ 90 | Lighthouse CI |
 
@@ -212,7 +212,6 @@ Las pruebas se **pausan temporalmente** si ocurre cualquiera de los siguientes e
 | El entorno de prueba (staging/local) no levanta o está inestable | Sergio (DevOps) | 4 horas |
 | Se detecta un defecto Critical que bloquea más del 30% de los casos de prueba | Abraham (Dev) | Hasta resolución del bug |
 | Las migraciones de base de datos fallan o corrompen datos de test | Abraham (Dev) | Hasta restauración del entorno |
-| El servicio de Stripe en modo test no responde | Equipo | Hasta que Stripe restablezca el servicio |
 | Más del 20% de los tests E2E fallan por razones de infraestructura (no bugs) | Héctor (QA) | Hasta estabilización del entorno |
 
 **Reanudación:** el QA Lead verifica que la condición de suspensión se resolvió antes de reanudar. Se documenta en el registro de defectos el tiempo perdido y la causa.
@@ -223,9 +222,9 @@ Las pruebas se **pausan temporalmente** si ocurre cualquiera de los siguientes e
 
 | Rol | Miembro | Responsabilidades |
 |---|---|---|
-| **QA Lead / Dev** | Sergio Ernesto Rosas Ducoing | Aprobación del Test Plan · Configuración de entornos · Pipeline CI/CD · Pruebas de rendimiento (k6) · Pruebas de seguridad · Corrección de tsconfig · Logging estructurado |
+| **QA Lead / Dev** | Sergio Ernesto Rosas Ducoing | Aprobación del Test Plan · Configuración de entornos · Pipeline CI/CD · Pruebas de rendimiento (JMeter) · Pruebas de seguridad · Corrección de tsconfig · Logging estructurado |
 | **Developer / QA** | Abraham Rodriguez Contreras | Pruebas unitarias de todos los servicios · Pruebas de integración API (Supertest) · Pruebas de BD Relacional y NoSQL · Corrección de bugs detectados |
-| **QA / Frontend** | Héctor Javier Adrian Zaragoza | Pruebas E2E (Playwright) · Accesibilidad (WCAG 2.1) · Compatibilidad de navegadores · Casos de Prueba (documento) · Registro de Defectos (template) |
+| **QA / Frontend** | Héctor Javier Adrian Zaragoza | Pruebas E2E (Cypress) · Accesibilidad (WCAG 2.1) · Compatibilidad de navegadores · Casos de Prueba (documento) · Registro de Defectos (template) |
 
 **Proceso de revisión:** los Pull Requests que afecten módulos con pruebas requieren que al menos un miembro distinto al autor revise y apruebe los tests antes del merge.
 
@@ -245,7 +244,6 @@ Las pruebas se **pausan temporalmente** si ocurre cualquiera de los siguientes e
 | Aspecto | Local/CI | Staging | Producción |
 |---|---|---|---|
 | Datos | Fixtures/seeds deterministas | Datos semilla representativos | Datos reales de usuarios |
-| Stripe | Modo test (`sk_test_...`) | Modo test (`sk_test_...`) | Modo live (`sk_live_...`) |
 | JWT Secret | Variable de entorno `.env.test` | Variable de entorno de staging | Secret Manager |
 | Logs | Console (desarrollo) | JSON estructurado (Winston) | JSON estructurado + rotación |
 | CORS | Permisivo (`localhost`) | Restrictivo (dominio de staging) | Restrictivo (dominio de producción) |
@@ -256,14 +254,14 @@ Las pruebas se **pausan temporalmente** si ocurre cualquiera de los siguientes e
 
 | Herramienta | Versión | Uso | Justificación |
 |---|---|---|---|
-| **Jest** | 30.x | Unit tests + Integration tests (backend) | Ya instalado en el proyecto; integración nativa con NestJS Testing Module; excelente soporte para mocks y espías |
+| **Jest** | 30.x | Unit tests + Integration tests (backend) | Ya instalado en el proyecto; usado en clase; integración nativa con NestJS; patrón describe/it/expect |
 | **Supertest** | 7.x | Pruebas HTTP de API REST | Ya instalado; permite levantar el servidor NestJS en memoria sin puerto real; mantiene estado de cookies/headers |
 | **mongodb-memory-server** | latest | BD NoSQL en memoria para tests | Sin dependencia de Docker en CI; base de datos real de MongoDB limpia por test |
-| **Playwright** | latest | Pruebas E2E en el navegador | Multi-browser nativo (Chromium, Firefox, Safari); API más moderna que Cypress; mejor soporte para Next.js |
-| **k6** | latest | Pruebas de rendimiento | Scripting en JavaScript; métricas precisas (P95, P99); soporte para Load/Stress/Spike/Soak en un mismo framework |
+| **Cypress** | latest | Pruebas E2E en el navegador | Framework usado en clase; soporte nativo para aplicaciones web; cy.intercept() para mock de red; integración sencilla con NestJS |
+| **JMeter** | latest | Pruebas de rendimiento | Herramienta usada en clase; interfaz gráfica y modo CLI; soporta Load/Stress/Spike/Soak; reportes detallados |
 | **OWASP ZAP** | latest | Escaneo de seguridad automatizado | Estándar de la industria para detección de OWASP Top 10; modo daemon para integración con CI |
 | **Snyk** | latest | Análisis de dependencias vulnerables | Integración directa con npm; alertas de CVE en el pipeline de CI |
-| **axe-core** | latest | Pruebas de accesibilidad | Librería estándar; integrable con Playwright para validar WCAG 2.1 automáticamente |
+| **axe-core** | latest | Pruebas de accesibilidad | Librería estándar; integrable con Cypress para validar WCAG 2.1 automáticamente |
 | **Lighthouse CI** | latest | Auditoría de accesibilidad y rendimiento frontend | Reportes reproducibles de Lighthouse en cada PR |
 | **Winston** | 3.x | Logging estructurado en JSON | Ampliamente usado en el ecosistema Node.js/NestJS; soporte para transports (consola, archivo, servicios externos) |
 
@@ -283,7 +281,7 @@ Open → In Progress → Fixed → Verified → Closed
 
 | Severidad | Definición | Ejemplos en Aionios |
 |---|---|---|
-| **Critical** | El sistema no puede operar; no hay workaround | Login falla para todos los usuarios · Pago se cobra pero no se registra en BD |
+| **Critical** | El sistema no puede operar; no hay workaround | Login falla para todos los usuarios · No se pueden crear solicitudes de cita |
 | **High** | Funcionalidad principal rota; workaround complicado | No se puede crear una solicitud de cita · JWT no expira correctamente |
 | **Medium** | Funcionalidad secundaria rota; workaround existe | Las notificaciones no se envían · Filtro de búsqueda retorna resultados incorrectos |
 | **Low** | Problema visual o de usabilidad menor | Texto mal alineado · Mensaje de error con typo · Traducciones faltantes |
@@ -381,8 +379,7 @@ Referencias:
 | ID | Riesgo | Probabilidad | Impacto | Mitigación |
 |---|---|---|---|---|
 | R-01 | Los tests de integración fallan en CI por diferencias entre BD local y Testcontainers | Media | Alto | Usar la misma versión de PostgreSQL en Docker local y en Testcontainers; documentar la versión en `docker-compose.yml` |
-| R-02 | Las pruebas E2E son inestables (flaky) por condiciones de red o timing | Alta | Medio | Configurar retry de máximo 2 intentos en Playwright; usar `waitForResponse` en vez de `sleep`; aislar la BD de staging con seeders deterministas |
-| R-03 | La integración con Stripe Webhooks es difícil de probar localmente | Alta | Alto | Usar Stripe CLI (`stripe listen --forward-to`) en entorno local; mockear el webhook en tests unitarios del `PaymentsService` |
+| R-02 | Las pruebas E2E son inestables (flaky) por condiciones de red o timing | Alta | Medio | Configurar retry de máximo 2 intentos en Cypress (retries config); usar cy.intercept() para controlar red; aislar la BD de staging con seeders deterministas |
 | R-04 | Baja cobertura de código en el módulo de Horarios por complejidad de lógica de fechas | Media | Medio | Priorizar unit tests de funciones de cálculo de disponibilidad; usar `jest.setSystemTime()` para control de fechas |
 | R-05 | MongoDB Atlas en staging no disponible durante las pruebas | Baja | Alto | Tener una instancia de MongoDB local en Docker como fallback; `mongodb-memory-server` para CI |
 | R-06 | Tiempo insuficiente para implementar todos los tipos de prueba antes de la entrega | Alta | Alto | Priorizar Unit > Integration API > E2E > Performance > Security; documentar lo pendiente en el registro de deuda técnica |

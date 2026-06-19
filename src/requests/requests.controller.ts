@@ -1,4 +1,14 @@
-import { Controller, Post, Body, Get, Param, Patch, Delete, Req, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Patch,
+  Delete,
+  Req,
+  HttpCode,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { RequestsService } from './requests.service';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -8,13 +18,23 @@ export class RequestsController {
   constructor(private requestsService: RequestsService) {}
 
   @Post()
-  @Roles('cliente', 'administrador de negocio', 'staff del negocio', 'super administrador')
+  @Roles(
+    'cliente',
+    'administrador de negocio',
+    'staff del negocio',
+    'super administrador',
+  )
   create(@Body() body: any) {
     return this.requestsService.create(body);
   }
 
   @Get('mine')
-  @Roles('cliente', 'administrador de negocio', 'staff del negocio', 'super administrador')
+  @Roles(
+    'cliente',
+    'administrador de negocio',
+    'staff del negocio',
+    'super administrador',
+  )
   findMine(@Req() req: Request & { user: { sub: number } }) {
     return this.requestsService.findByUsuario(req.user.sub);
   }
@@ -32,7 +52,12 @@ export class RequestsController {
   }
 
   @Get(':id')
-  @Roles('cliente', 'administrador de negocio', 'staff del negocio', 'super administrador')
+  @Roles(
+    'cliente',
+    'administrador de negocio',
+    'staff del negocio',
+    'super administrador',
+  )
   findOne(@Param('id') id: string) {
     return this.requestsService.findOne(Number(id));
   }
@@ -52,17 +77,33 @@ export class RequestsController {
   /* ── Mensajes de coordinación (a_convenir) ── */
 
   @Get(':id/mensajes')
-  @Roles('cliente', 'administrador de negocio', 'staff del negocio', 'super administrador')
+  @Roles(
+    'cliente',
+    'administrador de negocio',
+    'staff del negocio',
+    'super administrador',
+  )
   getMensajes(@Param('id') id: string) {
     return this.requestsService.getMensajes(Number(id));
   }
 
   @Post(':id/mensaje')
   @HttpCode(201)
-  @Roles('cliente', 'administrador de negocio', 'staff del negocio', 'super administrador')
+  @Roles(
+    'cliente',
+    'administrador de negocio',
+    'staff del negocio',
+    'super administrador',
+  )
   addMensaje(
     @Param('id') id: string,
-    @Body() body: { autor_id: number; autor_nombre: string; autor_tipo: string; texto: string },
+    @Body()
+    body: {
+      autor_id: number;
+      autor_nombre: string;
+      autor_tipo: string;
+      texto: string;
+    },
   ) {
     return this.requestsService.addMensaje(Number(id), body);
   }

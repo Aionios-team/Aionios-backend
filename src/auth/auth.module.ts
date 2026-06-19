@@ -6,20 +6,20 @@ import { AuthController } from './auth.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
-	imports: [
-		ConfigModule,
-		JwtModule.registerAsync({
-			imports: [ConfigModule],
-			inject: [ConfigService],
-			useFactory: async (configService: ConfigService) => ({
-				secret: configService.get<string>('JWT_SECRET') || 'default_secret',
-				signOptions: { expiresIn: '7d' },
-			}),
-		}),
-		PrismaModule,
-	],
-	providers: [AuthService],
-	controllers: [AuthController],
-	exports: [AuthService],
+  imports: [
+    ConfigModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET') || 'default_secret',
+        signOptions: { expiresIn: '7d' },
+      }),
+    }),
+    PrismaModule,
+  ],
+  providers: [AuthService],
+  controllers: [AuthController],
+  exports: [AuthService],
 })
 export class AuthModule {}

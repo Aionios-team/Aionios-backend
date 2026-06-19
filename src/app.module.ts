@@ -27,7 +27,7 @@ import { ConfigService } from '@nestjs/config';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, 
+      isGlobal: true,
     }),
     MongooseModule.forRootAsync({
       useFactory: () => ({
@@ -35,18 +35,19 @@ import { ConfigService } from '@nestjs/config';
       }),
     }),
     PrismaModule,
-    AuthModule, 
-    UsersModule, 
-    BusinessModule, 
-    ServicesModule, 
-    RequestsModule, 
+    AuthModule,
+    UsersModule,
+    BusinessModule,
+    ServicesModule,
+    RequestsModule,
     PaymentsModule,
-    HorariosModule, 
-    ReviewsModule, 
-    NotificationsModule, 
-    ActivityLogsModule, 
-    SupportTicketsModule, 
-    BusinessUiModule],
+    HorariosModule,
+    ReviewsModule,
+    NotificationsModule,
+    ActivityLogsModule,
+    SupportTicketsModule,
+    BusinessUiModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,

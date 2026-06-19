@@ -6,19 +6,20 @@ export type RequestMessageDocument = RequestMessage & Document;
 @Schema({ timestamps: true })
 export class RequestMessage {
   @Prop({ required: true })
-  solicitud_id: number;
+  solicitud_id!: number;
 
   @Prop({ required: true })
-  autor_id: number;
+  autor_id!: number;
 
   @Prop({ required: true })
-  autor_nombre: string;
+  autor_nombre!: string;
 
   @Prop({ enum: ['cliente', 'negocio'], required: true })
-  autor_tipo: string;
+  autor_tipo!: string;
 
   @Prop({ required: true })
-  texto: string;
+  texto!: string;
 }
 
-export const RequestMessageSchema = SchemaFactory.createForClass(RequestMessage);
+export const RequestMessageSchema =
+  SchemaFactory.createForClass(RequestMessage);

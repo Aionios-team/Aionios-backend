@@ -5,8 +5,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Horario, HorarioSchema } from './schemas/horario.schema';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Horario.name, schema: HorarioSchema }])],
+  imports: [
+    MongooseModule.forFeature([{ name: Horario.name, schema: HorarioSchema }]),
+  ],
   controllers: [HorariosController],
-  providers: [HorariosService]
+  providers: [HorariosService],
 })
 export class HorariosModule {}

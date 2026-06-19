@@ -9,12 +9,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     const pool = new Pool({
       connectionString: process.env.DATABASE_URL,
     });
-    
+
     const adapter = new PrismaPg(pool);
-    
-    super({ 
+
+    super({
       adapter,
-      log: ['query', 'error'] 
+      log: ['query', 'error'],
     });
   }
 

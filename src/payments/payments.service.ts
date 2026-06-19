@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EstadoPago } from '@prisma/client';
 
@@ -11,7 +15,15 @@ export class PaymentsService {
   }
 
   findAll() {
-    return this.prisma.pago.findMany({ include: { cita: { include: { usuario: { select: { id: true, nombre: true, apellido: true } } } } } });
+    return this.prisma.pago.findMany({
+      include: {
+        cita: {
+          include: {
+            usuario: { select: { id: true, nombre: true, apellido: true } },
+          },
+        },
+      },
+    });
   }
 
   findByNegocio(negocioId: number) {
@@ -31,7 +43,13 @@ export class PaymentsService {
   async findOne(id: number) {
     const payment = await this.prisma.pago.findUnique({
       where: { id },
-      include: { cita: { include: { usuario: { select: { id: true, nombre: true, apellido: true } } } } },
+      include: {
+        cita: {
+          include: {
+            usuario: { select: { id: true, nombre: true, apellido: true } },
+          },
+        },
+      },
     });
     if (!payment) throw new NotFoundException('Pago no encontrado');
     return payment;
@@ -45,16 +63,22 @@ export class PaymentsService {
     return this.prisma.pago.delete({ where: { id } });
   }
 
-  async updateStatusByTransaction(transactionId: string, estado_pago: EstadoPago) {
-    const payment = await this.prisma.pago.findUnique({ where: { transaccion_id: transactionId } });
-    if (!payment) throw new NotFoundException('Pago no encontrado por transaccion_id');
+  async updateStatusByTransaction(
+    transactionId: string,
+    estado_pago: EstadoPago,
+  ) {
+    const payment = await this.prisma.pago.findUnique({
+      where: { transaccion_id: transactionId },
+    });
+    if (!payment)
+      throw new NotFoundException('Pago no encontrado por transaccion_id');
     return this.prisma.pago.update({
       where: { id: payment.id },
       data: { estado_pago },
     });
   }
 
-  async ensureWebhookSecret(secret?: string) {
+  ensureWebhookSecret(secret?: string) {
     if (!secret) throw new BadRequestException('Missing STRIPE_WEBHOOK_SECRET');
     return secret;
   }

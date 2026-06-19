@@ -3,22 +3,19 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
-import { RequestMessage, RequestMessageDocument } from './schemas/request-message.schema';
+import {
+  RequestMessage,
+  RequestMessageDocument,
+} from './schemas/request-message.schema';
+import { formatFecha } from '../common/utils/date.utils';
 
 const userSelect = {
-  id: true, nombre: true, apellido: true, email: true, telefono: true,
+  id: true,
+  nombre: true,
+  apellido: true,
+  email: true,
+  telefono: true,
 };
-
-function formatFecha(date: Date | string): string {
-  const d = new Date(date);
-  return d.toLocaleString('es-MX', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
 
 @Injectable()
 export class RequestsService {
@@ -61,7 +58,9 @@ export class RequestsService {
   }
 
   findAll() {
-    return this.prisma.solicitud.findMany({ include: { usuario: { select: userSelect } } });
+    return this.prisma.solicitud.findMany({
+      include: { usuario: { select: userSelect } },
+    });
   }
 
   findByNegocio(negocioId: number) {
@@ -76,8 +75,17 @@ export class RequestsService {
     return this.prisma.solicitud.findMany({
       where: { id_usuario: userId },
       include: {
-        negocio: { select: { id: true, nombre: true, slug: true, direccion: true } },
-        pagos:   { select: { id: true, monto: true, metodo_pago: true, estado_pago: true } },
+        negocio: {
+          select: { id: true, nombre: true, slug: true, direccion: true },
+        },
+        pagos: {
+          select: {
+            id: true,
+            monto: true,
+            metodo_pago: true,
+            estado_pago: true,
+          },
+        },
       },
       orderBy: { fecha_hora_propuesta: 'desc' },
     });
@@ -101,7 +109,10 @@ export class RequestsService {
       },
     });
 
-    const solicitud = await this.prisma.solicitud.update({ where: { id }, data });
+    const solicitud = await this.prisma.solicitud.update({
+      where: { id },
+      data,
+    });
 
     if (solicitudActual && data.estado) {
       const fecha = formatFecha(solicitudActual.fecha_hora_propuesta);
@@ -153,7 +164,15 @@ export class RequestsService {
       .exec();
   }
 
-  addMensaje(solicitudId: number, data: { autor_id: number; autor_nombre: string; autor_tipo: string; texto: string }) {
+  addMensaje(
+    solicitudId: number,
+    data: {
+      autor_id: number;
+      autor_nombre: string;
+      autor_tipo: string;
+      texto: string;
+    },
+  ) {
     return this.messageModel.create({ solicitud_id: solicitudId, ...data });
   }
 }

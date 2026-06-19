@@ -9,9 +9,7 @@ import { ActivityLogsService } from '../../activity-logs/activity-logs.service';
 
 @Injectable()
 export class ActivityLoggingInterceptor implements NestInterceptor {
-  constructor(
-    private activityLogsService: ActivityLogsService,
-  ) {}
+  constructor(private activityLogsService: ActivityLogsService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();

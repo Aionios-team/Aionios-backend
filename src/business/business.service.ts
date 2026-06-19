@@ -46,6 +46,9 @@ export class BusinessService {
   }
 
   listStaff(negocioId: number) {
-    return this.prisma.staff.findMany({ where: { negocioId }, include: { usuario: true } });
+    return this.prisma.staff.findMany({
+      where: { negocioId },
+      include: { usuario: true },
+    });
   }
 }

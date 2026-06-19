@@ -5,41 +5,52 @@ import { Review, ReviewDocument } from './schemas/review.schema';
 
 @Injectable()
 export class ReviewsService {
-	constructor(@InjectModel(Review.name) private reviewModel: Model<ReviewDocument>) {}
+  constructor(
+    @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
+  ) {}
 
-	create(data: any) {
-		return this.reviewModel.create(data);
-	}
+  create(data: any) {
+    return this.reviewModel.create(data);
+  }
 
-	findAll(limit = 100) {
-		return this.reviewModel.find().sort({ createdAt: -1 }).limit(limit).exec();
-	}
+  findAll(limit = 100) {
+    return this.reviewModel.find().sort({ createdAt: -1 }).limit(limit).exec();
+  }
 
-	findByNegocio(negocioId: number, limit = 100) {
-		return this.reviewModel.find({ negocio_id: negocioId }).sort({ createdAt: -1 }).limit(limit).exec();
-	}
+  findByNegocio(negocioId: number, limit = 100) {
+    return this.reviewModel
+      .find({ negocio_id: negocioId })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .exec();
+  }
 
-	findByUsuario(userId: number) {
-		return this.reviewModel.find({ usuario_id: userId }).sort({ createdAt: -1 }).exec();
-	}
+  findByUsuario(userId: number) {
+    return this.reviewModel
+      .find({ usuario_id: userId })
+      .sort({ createdAt: -1 })
+      .exec();
+  }
 
-	findOne(id: string) {
-		return this.reviewModel.findById(id).exec();
-	}
+  findOne(id: string) {
+    return this.reviewModel.findById(id).exec();
+  }
 
-	update(id: string, data: any) {
-		return this.reviewModel.findByIdAndUpdate(id, data, { new: true }).exec();
-	}
+  update(id: string, data: any) {
+    return this.reviewModel.findByIdAndUpdate(id, data, { new: true }).exec();
+  }
 
-	addRespuesta(id: string, respuesta: string) {
-		return this.reviewModel.findByIdAndUpdate(
-			id,
-			{ respuesta, fecha_respuesta: new Date() },
-			{ new: true },
-		).exec();
-	}
+  addRespuesta(id: string, respuesta: string) {
+    return this.reviewModel
+      .findByIdAndUpdate(
+        id,
+        { respuesta, fecha_respuesta: new Date() },
+        { new: true },
+      )
+      .exec();
+  }
 
-	remove(id: string) {
-		return this.reviewModel.findByIdAndDelete(id).exec();
-	}
+  remove(id: string) {
+    return this.reviewModel.findByIdAndDelete(id).exec();
+  }
 }

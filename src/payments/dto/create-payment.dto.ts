@@ -2,13 +2,13 @@ import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreatePaymentDto {
   @IsNumber()
-  id_cita: number;
+  id_cita!: number;
 
   @IsNumber()
-  monto: number;
+  monto!: number;
 
   @IsString()
-  metodo_pago: string;
+  metodo_pago!: string;
 
   @IsOptional()
   @IsString()

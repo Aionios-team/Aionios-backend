@@ -5,18 +5,17 @@ export type ActivityLogDocument = ActivityLog & Document;
 
 @Schema({ timestamps: true })
 export class ActivityLog {
-	@Prop()
-	usuario_id: number;
+  @Prop()
+  usuario_id!: number;
 
-	@Prop({ required: true })
-	accion: string;
+  @Prop({ required: true })
+  accion!: string;
 
-	@Prop({ type: Object, default: {} })
-	metadata: any;
+  @Prop({ type: Object, default: {} })
+  metadata!: any;
 
-	@Prop()
-	timestamp: Date;
+  @Prop()
+  timestamp!: Date;
 }
 
 export const ActivityLogSchema = SchemaFactory.createForClass(ActivityLog);
-
